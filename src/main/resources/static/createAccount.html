@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Create Account</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI';
+            background: linear-gradient(-45deg, #0f172a, #1e3a8a, #2563eb, #38bdf8);
+            background-size: 400% 400%;
+            animation: bg 10s ease infinite;
+        }
+
+        @keyframes bg {
+            0% {background-position:0% 50%;}
+            50% {background-position:100% 50%;}
+            100% {background-position:0% 50%;}
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 380px;
+            box-shadow: 0px 5px 25px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        h2 {
+            color: #1e3a8a;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 10px;
+            margin: 12px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background: #1e40af;
+        }
+
+        .success {
+            color: green;
+            margin-top: 10px;
+        }
+
+        .acc-box {
+            background: #f1f5f9;
+            padding: 12px;
+            margin-top: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            color: #1e3a8a;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="card">
+
+        <h2>🏦 Create Account</h2>
+
+        <select id="accType">
+            <option value="">Select Account Type</option>
+            <option value="Savings">Savings</option>
+            <option value="Current">Current</option>
+            <option value="Student">Student</option>
+        </select>
+
+        <input id="pin" type="password" maxlength="4" placeholder="Set 4-digit PIN">
+
+        <button onclick="createAccount()">Create Account</button>
+
+        <p id="msg"></p>
+
+        <div id="accDisplay" class="acc-box" style="display:none;"></div>
+
+    </div>
+</div>
+
+<script>
+
+    let user = localStorage.getItem("user");
+
+    // 🔥 LOAD EXISTING ACCOUNT TYPES & DISABLE THEM
+    function loadAccountOptions(){
+
+        let user = localStorage.getItem("user");
+
+        fetch(`http://localhost:8081/users/accountSummary?username=${user}`)
+            .then(res=>res.json())
+            .then(data=>{
+
+                let counts = data.typeCount;
+
+                let select = document.getElementById("accType");
+                select.innerHTML = "<option value=''>Select Account Type</option>";
+
+                if(counts.Savings < 2){
+                    select.innerHTML += "<option>Savings</option>";
+                }
+
+                if(counts.Current < 2){
+                    select.innerHTML += "<option>Current</option>";
+                }
+
+                if(counts.Student < 1){
+                    select.innerHTML += "<option>Student</option>";
+                }
+
+            });
+    }
+
+    // 🔥 CREATE ACCOUNT
+    function createAccount(){
+
+        let type = document.getElementById("accType").value;
+        let pin = document.getElementById("pin").value;
+        let user = localStorage.getItem("user");
+
+        // ❌ TYPE CHECK
+        if(type === ""){
+            document.getElementById("msg").innerText = "❌ Please select account type";
+            return;
+        }
+
+        // 🔥 PIN VALIDATION (ONLY 4 DIGIT NUMBER)
+        let pinRegex = /^[0-9]{4}$/;
+
+        if(!pinRegex.test(pin)){
+            document.getElementById("msg").innerText =
+                "❌ PIN must be exactly 4 digits (numbers only)";
+            return;
+        }
+
+        // ✅ API CALL
+        fetch("http://localhost:8081/users/createAccount",{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body: JSON.stringify({
+                accountType: type,
+                pin: pin,
+                username: user,
+                balance: 0
+            })
+        })
+            .then(res=>res.text())
+            .then(msg=>{
+                document.getElementById("msg").innerText = msg;
+
+                if(msg.includes("success")){
+                    setTimeout(()=>{
+                        window.location.href="dashboard.html";
+                    },2000);
+                }
+            });
+    }
+
+    // INIT
+    loadExistingAccounts();
+    window.onload = loadAccountOptions;
+
+</script>
+
+</body>
+</html>

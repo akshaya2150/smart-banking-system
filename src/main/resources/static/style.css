@@ -1,0 +1,271 @@
+/* RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* BODY */
+body {
+    background: #f5f7fa;
+}
+
+/* HEADER */
+header {
+    background: #0f172a;
+    color: white;
+    padding: 15px;
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+/* LAYOUT */
+.container {
+    display: flex;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 220px;
+    height: 100vh;
+    background: #1e293b;
+    padding: 20px;
+}
+
+.sidebar h3 {
+    color: #cbd5e1;
+    margin-bottom: 20px;
+}
+
+.sidebar button {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 10px;
+    background: #334155;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: 0.3s;
+}
+
+.sidebar button:hover {
+    background: #3b82f6;
+}
+
+/* MAIN */
+.main {
+    flex: 1;
+    padding: 20px;
+}
+
+/* CARD */
+.card {
+    background: white;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.card h2 {
+    margin-bottom: 15px;
+}
+
+/* INPUT */
+input {
+    padding: 10px;
+    margin: 8px 0;
+    width: 250px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+/* BUTTON */
+button {
+    padding: 10px 20px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #2563eb;
+}
+
+/* TABLE */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: #1e293b;
+    color: white;
+}
+
+th, td {
+    padding: 12px;
+    border: 1px solid #ddd;
+}
+
+tr:nth-child(even) {
+    background: #f1f5f9;
+}
+
+/* TOP BAR */
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 30px;
+    background: #0f172a;
+    color: white;
+    font-size: 20px;
+}
+
+.nav-btns button {
+    margin-left: 10px;
+}
+
+/* HERO */
+.hero {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 60px;
+    background: linear-gradient(to right, #3b82f6, #06b6d4);
+    color: white;
+}
+
+.hero-text h1 {
+    font-size: 40px;
+}
+
+.hero-text p {
+    margin: 15px 0;
+    font-size: 18px;
+}
+
+/* FEATURES */
+.features {
+    display: flex;
+    justify-content: space-around;
+    padding: 40px;
+}
+
+.feature-card {
+    background: white;
+    padding: 20px;
+    width: 200px;
+    text-align: center;
+    border-radius: 10px;
+    box-shadow: 0px 5px 15px rgba(0,0,0,0.1);
+}
+
+/* FOOTER */
+footer {
+    text-align: center;
+    padding: 20px;
+    background: #1e293b;
+    color: white;
+}
+
+/* ANIMATION */
+.fade {
+    animation: fadeIn 1s ease-in;
+}
+
+.account-cards {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.account-card {
+    padding: 15px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #2563eb, #1e3a8a);
+    color: white;
+    cursor: pointer;
+    min-width: 200px;
+    transition: 0.3s;
+}
+
+.account-card:hover {
+    transform: scale(1.05);
+}
+
+.active-card {
+    border: 3px solid #00e5ff;
+}
+
+.balance-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+    text-align: center;
+    box-shadow: 0px 5px 15px rgba(0,0,0,0.1);
+}
+
+.dark {
+    background: #0f172a;
+    color: white;
+}
+
+/* DARK MODE FULL FIX */
+.dark {
+    background: #0f172a;
+    color: white;
+}
+
+/* HEADER */
+.dark header {
+    background: #020617;
+}
+
+/* SIDEBAR */
+.dark .sidebar {
+    background: #020617;
+}
+
+.dark .sidebar button {
+    color: #e2e8f0;
+}
+
+/* CARDS */
+.dark .card {
+    background: #1e293b;
+    color: #e2e8f0;
+}
+
+/* INPUTS */
+.dark input {
+    background: #0f172a;
+    color: white;
+    border: 1px solid #334155;
+}
+
+/* TABLE */
+.dark table {
+    color: white;
+}
+
+.dark th, .dark td {
+    border-color: #334155;
+}
+
+/* BALANCE CARD */
+.dark .balance-card {
+    background: #1e293b;
+}
+
+/* ACCOUNT CARDS */
+.dark .account-card {
+    background: linear-gradient(135deg, #1e293b, #020617);
+}

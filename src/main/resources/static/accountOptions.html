@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Account Options</title>
+
+    ```
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI';
+            background: linear-gradient(-45deg, #0f172a, #1e3a8a, #2563eb, #38bdf8);
+            background-size: 400% 400%;
+            animation: bg 10s ease infinite;
+        }
+
+        @keyframes bg {
+            0% {background-position:0% 50%;}
+            50% {background-position:100% 50%;}
+            100% {background-position:0% 50%;}
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            background: white;
+            padding: 35px;
+            border-radius: 15px;
+            width: 350px;
+            text-align: center;
+            box-shadow: 0px 8px 30px rgba(0,0,0,0.3);
+        }
+
+        h2 {
+            color: #1e3a8a;
+            margin-bottom: 20px;
+        }
+
+        p {
+            color: #555;
+            margin-bottom: 25px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        .dashboard-btn {
+            background: #2563eb;
+            color: white;
+        }
+
+        .dashboard-btn:hover {
+            background: #1e40af;
+        }
+
+        .create-btn {
+            background: #10b981;
+            color: white;
+        }
+
+        .create-btn:hover {
+            background: #059669;
+        }
+
+        .info-box {
+            background: #f1f5f9;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+    </style>
+    ```
+
+</head>
+
+<body>
+
+<div class="container">
+    <div class="card">
+
+        ```
+        <h2>👋 Welcome</h2>
+
+        <p id="userText"></p>
+
+        <div class="info-box" id="accInfo"></div>
+
+        <button class="dashboard-btn" onclick="goDashboard()">📊 Go to Dashboard</button>
+        <button class="create-btn" onclick="goCreate()">➕ Create New Account</button>
+
+    </div>
+    ```
+
+</div>
+
+<script>
+
+    let user = localStorage.getItem("user");
+
+    // Show username
+    document.getElementById("userText").innerText = "Hello, " + user + " 👋";
+
+    // Load account info
+    fetch(`http://localhost:8081/users/accountSummary?username=${user}`)
+        .then(res=>res.json())
+        .then(data=>{
+
+            let info = `
+        Total Accounts: ${data.totalAccounts} <br>
+        Savings: ${data.typeCount.Savings} / 2 <br>
+        Current: ${data.typeCount.Current} / 2 <br>
+        Student: ${data.typeCount.Student} / 1
+    `;
+
+            document.getElementById("accInfo").innerHTML = info;
+        });
+
+    function goDashboard(){
+        window.location.href="dashboard.html";
+    }
+
+    function goCreate(){
+        window.location.href="createAccount.html";
+    }
+
+</script>
+
+</body>
+</html>

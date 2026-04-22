@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Dashboard</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI';
+            background: linear-gradient(135deg,#0f172a,#1e3a8a);
+            color: white;
+        }
+
+        /* HEADER */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .topbar .center {
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 200px;
+            background: #020617;
+            height: 100vh;
+            padding: 10px;
+        }
+
+        .sidebar button {
+            width: 100%;
+            padding: 12px;
+            background: none;
+            color: #cbd5f5;
+            border: none;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .sidebar button:hover {
+            background: #1e293b;
+            transform: translateX(5px);
+        }
+
+        .container {
+            display: flex;
+        }
+
+        .main {
+            flex: 1;
+            padding: 20px;
+        }
+
+        /* CARD */
+        .card {
+            background: rgba(255,255,255,0.08);
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .hidden { display:none; }
+
+        /* ACCOUNT CARDS */
+        .account-cards {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+        }
+
+        .account-card {
+            min-width: 200px;
+            padding: 20px;
+            border-radius: 15px;
+            background: linear-gradient(135deg,#3b82f6,#1e40af);
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .account-card:hover {
+            transform: scale(1.1);
+        }
+
+        .active-card {
+            border: 3px solid cyan;
+        }
+
+        /* BALANCE */
+        .balance-card {
+            margin-top: 10px;
+        }
+
+        /* TABLE */
+        table {
+            width: 100%;
+            text-align: center;
+        }
+
+        tr:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* DARK MODE */
+        .dark {
+            background: #020617;
+        }
+
+        /* SEARCH */
+        #searchBox {
+            padding: 10px;
+            margin-bottom: 10px;
+            width: 50%;
+        }
+    </style>
+
+</head>
+
+<body>
+
+<header class="topbar">
+    <div>👋 Welcome</div>
+    <div class="center" id="welcomeText"></div>
+    <div>
+        <button onclick="toggleDark()">🌙</button>
+        <button onclick="logout()">Logout</button>
+    </div>
+</header>
+
+<div class="container">
+
+
+    <div class="sidebar">
+        <button onclick="show('dashboard')">Dashboard</button>
+        <button onclick="show('deposit')">Deposit</button>
+        <button onclick="show('withdraw')">Withdraw</button>
+        <button onclick="show('transfer')">Transfer</button>
+        <button onclick="show('history')">History</button>
+    </div>
+
+    <div class="main">
+
+        <!-- DASHBOARD -->
+        <div id="dashboard" class="card">
+
+            <h3>🏦 Select Account</h3>
+            <div id="accountCards" class="account-cards"></div>
+
+            <h3>💳 Check Balance</h3>
+            <input id="pinCheck" type="password" placeholder="Enter PIN">
+            <button onclick="checkBalance()">Check Balance</button>
+
+            <div class="balance-card">
+                <div id="balanceBox" style="display:none;">
+                    <h2 id="balance"></h2>
+                </div>
+            </div>
+
+            <h3>📌 Last Transaction</h3>
+            <div id="lastTxn"></div>
+
+        </div>
+
+        <!-- DEPOSIT -->
+        <div id="deposit" class="card hidden">
+            <input id="dAmt" placeholder="Amount">
+            <button onclick="deposit()">Deposit</button>
+        </div>
+
+        <!-- WITHDRAW -->
+        <div id="withdraw" class="card hidden">
+            <input id="wAmt" placeholder="Amount">
+            <button onclick="withdraw()">Withdraw</button>
+        </div>
+
+        <!-- TRANSFER -->
+        <div id="transfer" class="card hidden">
+            <input id="toAccount" placeholder="Receiver Account">
+            <input id="tAmt" placeholder="Amount">
+            <button onclick="transfer()">Transfer</button>
+        </div>
+
+        <!-- HISTORY -->
+        <div id="history" class="card hidden">
+            <input id="searchBox" placeholder="Search..." onkeyup="filterTable()">
+            <table>
+                <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                </tr>
+                </thead>
+                <tbody id="table"></tbody>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+    let user = localStorage.getItem("user");
+    let selectedAccount = "";
+
+    document.getElementById("welcomeText").innerText = user;
+
+    // NAV
+    function show(id){
+        document.querySelectorAll(".card").forEach(c=>c.classList.add("hidden"));
+        document.getElementById(id).classList.remove("hidden");
+    }
+
+    // LOGOUT
+    function logout(){
+        localStorage.clear();
+        window.location.href="index.html";
+    }
+
+    // LOAD ACCOUNTS
+    function loadAccounts(){
+        fetch(`http://localhost:8081/users/accounts?username=${user}`)
+            .then(res=>res.json())
+            .then(data=>{
+
+                let container=document.getElementById("accountCards");
+                container.innerHTML="";
+
+                data.forEach((acc,i)=>{
+
+                    let card=document.createElement("div");
+                    card.className="account-card";
+
+                    card.innerHTML=`<h4>${acc.accountType}</h4><p>${acc.accountNumber}</p>`;
+
+                    card.onclick=function(){
+
+                        // animation
+                        card.style.transform="scale(1.1)";
+                        setTimeout(()=>card.style.transform="scale(1)",200);
+
+                        selectedAccount=acc.accountNumber;
+
+                        document.querySelectorAll(".account-card")
+                            .forEach(c=>c.classList.remove("active-card"));
+
+                        card.classList.add("active-card");
+
+                        document.getElementById("balanceBox").style.display="none";
+
+                        loadData();
+                    };
+
+                    if(i===0){
+                        selectedAccount=acc.accountNumber;
+                        card.classList.add("active-card");
+                    }
+
+                    container.appendChild(card);
+                });
+
+                loadData();
+            });
+    }
+
+    // LOAD DATA
+    function loadData(){
+
+        fetch(`http://localhost:8081/users/transactions?accountNumber=${selectedAccount}`)
+            .then(res=>res.json())
+            .then(data=>{
+
+                let table=document.getElementById("table");
+                table.innerHTML="";
+
+                data.forEach(t=>{
+
+                    let color = t.type.includes("Deposit") || t.type.includes("Received")
+                        ? "green" : "red";
+
+                    table.innerHTML+=`
+            <tr style="color:${color}">
+                <td>${t.type}</td>
+                <td>${t.amount}</td>
+                <td>${new Date(t.date).toLocaleString()}</td>
+            </tr>`;
+                });
+
+                // ✅ FIXED LAST TRANSACTION
+                if(data.length > 0){
+                    let last = data[data.length-1];
+                    document.getElementById("lastTxn").innerHTML =
+                        `💰 ${last.type} ₹${last.amount}`;
+                }
+            });
+    }
+
+    // BALANCE
+    function checkBalance(){
+        let pin=document.getElementById("pinCheck").value;
+
+        fetch(`http://localhost:8081/users/balance?accountNumber=${selectedAccount}&pin=${pin}`)
+            .then(res=>res.text())
+            .then(data=>{
+                if(data==-1) alert("Wrong PIN");
+                else{
+                    document.getElementById("balance").innerText="₹ "+data;
+                    document.getElementById("balanceBox").style.display="block";
+                }
+            });
+    }
+
+    // OPERATIONS
+    function deposit(){
+        let amt=document.getElementById("dAmt").value;
+        fetch(`http://localhost:8081/users/deposit?accountNumber=${selectedAccount}&amount=${amt}`,{method:"POST"})
+            .then(res=>res.text()).then(alert).then(loadData);
+    }
+
+    function withdraw(){
+        let amt=document.getElementById("wAmt").value;
+        fetch(`http://localhost:8081/users/withdraw?accountNumber=${selectedAccount}&amount=${amt}`,{method:"POST"})
+            .then(res=>res.text()).then(alert).then(loadData);
+    }
+
+    function transfer(){
+        let to=document.getElementById("toAccount").value;
+        let amt=document.getElementById("tAmt").value;
+        fetch(`http://localhost:8081/users/transfer?fromAccount=${selectedAccount}&toAccount=${to}&amount=${amt}`,{method:"POST"})
+            .then(res=>res.text()).then(alert).then(loadData);
+    }
+
+    // DARK MODE
+    function toggleDark(){
+        document.body.classList.toggle("dark");
+    }
+
+    // SEARCH
+    function filterTable(){
+        let val=document.getElementById("searchBox").value.toLowerCase();
+        document.querySelectorAll("#table tr").forEach(r=>{
+            r.style.display=r.innerText.toLowerCase().includes(val)?"":"none";
+        });
+    }
+
+    // INIT
+    loadAccounts();
+
+</script>
+
+</body>
+</html>

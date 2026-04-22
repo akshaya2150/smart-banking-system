@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Smart Banking</title>
+
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI';
+            background: linear-gradient(-45deg, #0f172a, #1e3a8a, #2563eb, #38bdf8);
+            background-size: 400% 400%;
+            animation: gradientBG 10s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .login-container {
+            display: flex;
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-box {
+            display: flex;
+            width: 700px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0px 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .left {
+            width: 50%;
+            background: url('https://cdn-icons-png.flaticon.com/512/3135/3135706.png') center/cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background-blend-mode: darken;
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        .left h2 {
+            color: #00e5ff;
+        }
+
+        .left p {
+            color: white;
+        }
+
+        .right {
+            width: 50%;
+            padding: 30px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .toggle {
+            text-align: center;
+            margin-top: 10px;
+            cursor: pointer;
+            color: blue;
+        }
+    </style>
+
+
+</head>
+
+<body>
+
+<div class="login-container">
+    <div class="login-box">
+
+
+        <!-- LEFT -->
+        <div class="left">
+            <div>
+                <h2>Welcome Back 👋</h2>
+                <p>Secure banking experience</p>
+            </div>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="right">
+
+            <!-- LOGIN -->
+            <div id="loginForm">
+                <h2>Login</h2>
+                <input id="luser" placeholder="Username">
+                <input id="lpass" type="password" placeholder="Password">
+                <button onclick="login()">Login</button>
+                <div class="toggle" onclick="showRegister()">Don't have account? Register</div>
+            </div>
+
+            <!-- REGISTER -->
+            <div id="registerForm" style="display:none;">
+                <h2>Register</h2>
+                <input id="ruser" placeholder="Username">
+                <input id="rpass" type="password" placeholder="Password">
+                <button onclick="register()">Register</button>
+                <div class="toggle" onclick="showLogin()">Already have account? Login</div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+<script>
+
+    function showRegister(){
+        document.getElementById("loginForm").style.display="none";
+        document.getElementById("registerForm").style.display="block";
+    }
+
+    function showLogin(){
+        document.getElementById("loginForm").style.display="block";
+        document.getElementById("registerForm").style.display="none";
+    }
+
+    // ✅ LOGIN FUNCTION (UPDATED)
+    function login(){
+
+        let u = document.getElementById("luser").value;
+        let p = document.getElementById("lpass").value;
+
+        fetch("http://localhost:8081/users/login",{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({username:u,password:p})
+        })
+            .then(res=>res.text())
+            .then(msg=>{
+                alert(msg);
+
+                if(msg.includes("Successful")){
+
+                    localStorage.setItem("user",u);
+
+                    // 🔥 NEW LOGIC
+                    fetch(`http://localhost:8081/users/accountSummary?username=${u}`)
+                        .then(res=>res.json())
+                        .then(data=>{
+
+                            console.log("Account Summary:", data);
+
+                            if(data.totalAccounts === 0){
+                                window.location.href = "createAccount.html";
+                            } else {
+                                window.location.href = "accountOptions.html";
+                            }
+
+                        });
+                }
+            });
+    }
+
+    // REGISTER
+    function register(){
+
+        let u = document.getElementById("ruser").value;
+        let p = document.getElementById("rpass").value;
+
+        fetch("http://localhost:8081/users/register",{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({username:u,password:p})
+        })
+            .then(res=>res.text())
+            .then(msg=>{
+                alert(msg);
+                showLogin();
+            });
+    }
+
+</script>
+
+</body>
+</html>
